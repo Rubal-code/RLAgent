@@ -2,7 +2,6 @@ from src.rl_agent_lab.agents.q_learning import QLearningAgent
 from src.rl_agent_lab.environments.grid_world import GridWorld
 from src.rl_agent_lab.training.train_q_learning import train
 
-
 ACTION_NAMES = {
     0: "UP",
     1: "DOWN",
