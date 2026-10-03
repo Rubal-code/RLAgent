@@ -36,6 +36,14 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
+# ML artifacts
+models/*.pt
+models/*.pth
+models/*.onnx
+models/*.h5
+models/*.pkl
+models/*.joblib
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
