@@ -1,6 +1,6 @@
-from src.rl_agent_lab.agents.q_learning import QLearningAgent
-from src.rl_agent_lab.environments.grid_world import GridWorld
-from src.rl_agent_lab.training.train_q_learning import train
+from rl_agent_lab.agents.model_io import load_q_table
+from rl_agent_lab.agents.q_learning import QLearningAgent
+from rl_agent_lab.environments.grid_world import GridWorld
 
 ACTION_NAMES = {
     0: "UP",
@@ -97,7 +97,12 @@ def print_policy(agent, env):
         print(line)
 
 if __name__ == "__main__":
-    agent, _ = train(episodes=1000)
+    agent = QLearningAgent()
+
+    load_q_table(
+        agent,
+        "models/q_table.json",
+    )
 
     env = GridWorld(size=5)
 
