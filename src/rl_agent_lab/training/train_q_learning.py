@@ -5,17 +5,17 @@ from rl_agent_lab.visualization.plot_rewards import plot_rewards
 
 def train(episodes=1000):
     env = GridWorld(size=5)
-
     agent = QLearningAgent()
 
     rewards = []
+    successes = []
 
     for episode in range(episodes):
         state = env.reset()
         total_reward = 0
-        max_steps = 100
+        success = False
 
-        for _ in range(max_steps):
+        for _ in range(100):
             action = agent.choose_action(state)
 
             next_state, reward, done = env.step(action)
@@ -32,21 +32,28 @@ def train(episodes=1000):
             total_reward += reward
 
             if done:
+                success = True
                 break
 
         agent.decay_exploration()
+
         rewards.append(total_reward)
+        successes.append(success)
 
         if (episode + 1) % 100 == 0:
+            success_rate = sum(successes[-100:]) / 100 * 100
+
             print(
                 f"Episode: {episode + 1}, "
                 f"Reward: {total_reward}, "
+                f"Success Rate: {success_rate:.1f}%, "
                 f"Epsilon: {agent.exploration_rate:.3f}"
             )
 
-    return agent, rewards
+    return agent, rewards, successes
 
 
 if __name__ == "__main__":
-    agent, rewards = train(episodes=1000)
+    agent, rewards, successes = train(episodes=1000)
+
     plot_rewards(rewards)
