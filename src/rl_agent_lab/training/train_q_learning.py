@@ -1,3 +1,4 @@
+from rl_agent_lab.agents.model_io import save_q_table
 from rl_agent_lab.agents.q_learning import QLearningAgent
 from rl_agent_lab.environments.grid_world import GridWorld
 from rl_agent_lab.visualization.plot_rewards import plot_rewards
@@ -55,5 +56,10 @@ def train(episodes=1000):
 
 if __name__ == "__main__":
     agent, rewards, successes = train(episodes=1000)
+
+    save_q_table(
+        agent,
+        "models/q_table.json",
+    )
 
     plot_rewards(rewards)
