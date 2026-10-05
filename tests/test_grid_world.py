@@ -22,11 +22,12 @@ def test_move_right():
 
 
 def test_reach_goal():
-    env = GridWorld(size=2)
+    env = GridWorld(size=2, obstacles=[])
 
     env.reset()
 
     env.step(1)
+
     state, reward, done = env.step(3)
 
     assert state == (1, 1)

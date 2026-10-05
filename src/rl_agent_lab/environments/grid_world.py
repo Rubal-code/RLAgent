@@ -1,16 +1,43 @@
 class GridWorld:
     """
-    Simple Grid World environment.
+    Grid World environment with obstacles.
 
-    The agent starts at the top-left corner
-    and tries to reach the goal at the bottom-right.
+    Actions:
+        0 -> UP
+        1 -> DOWN
+        2 -> LEFT
+        3 -> RIGHT
     """
 
-    def __init__(self, size=5):
+    ACTIONS = {
+        0: (-1, 0),  # UP
+        1: (1, 0),   # DOWN
+        2: (0, -1),  # LEFT
+        3: (0, 1),   # RIGHT
+    }
+
+    def __init__(self, size=5, obstacles=None):
         self.size = size
 
         self.start = (0, 0)
         self.goal = (size - 1, size - 1)
+
+        # Default obstacles
+        if obstacles is None:
+            self.obstacles = {
+                (0, 3),
+                (1, 1),
+                (1, 3),
+                (2, 1),
+                (3, 2),
+                (3, 3),
+            }
+        else:
+            self.obstacles = set(obstacles)
+
+        # Start and goal can never be obstacles.
+        self.obstacles.discard(self.start)
+        self.obstacles.discard(self.goal)
 
         self.position = self.start
 
@@ -22,43 +49,66 @@ class GridWorld:
         return self.position
 
     def step(self, action):
-        """
-        Perform one action.
+        """Perform one action."""
 
-        Actions:
-            0 -> UP
-            1 -> DOWN
-            2 -> LEFT
-            3 -> RIGHT
-        """
+        if action not in self.ACTIONS:
+            raise ValueError(f"Invalid action: {action}")
 
         row, col = self.position
 
-        if action == 0:
-            row -= 1
+        row_change, col_change = self.ACTIONS[action]
 
-        elif action == 1:
-            row += 1
+        new_row = row + row_change
+        new_col = col + col_change
 
-        elif action == 2:
-            col -= 1
+        new_position = (new_row, new_col)
 
-        elif action == 3:
-            col += 1
+        # Outside the grid
+        if not (
+            0 <= new_row < self.size
+            and 0 <= new_col < self.size
+        ):
+            return self.position, -5, False
 
-        # Prevent leaving the grid
-        row = max(0, min(row, self.size - 1))
-        col = max(0, min(col, self.size - 1))
+        # Obstacle
+        if new_position in self.obstacles:
+            return self.position, -5, False
 
-        self.position = (row, col)
+        # Move
+        self.position = new_position
 
-        # Goal reached
+        # Goal
         if self.position == self.goal:
-            reward = 10
-            done = True
+            return self.position, 10, True
 
-        else:
-            reward = -1
-            done = False
+        # Normal movement
+        return self.position, -1, False
 
-        return self.position, reward, done
+    def render(self):
+        """Print the current grid."""
+
+        for row in range(self.size):
+            line = ""
+
+            for col in range(self.size):
+
+                position = (row, col)
+
+                if position == self.position:
+                    line += "A "
+
+                elif position == self.start:
+                    line += "S "
+
+                elif position == self.goal:
+                    line += "G "
+
+                elif position in self.obstacles:
+                    line += "X "
+
+                else:
+                    line += ". "
+
+            print(line)
+
+        print()
