@@ -1,5 +1,6 @@
-from src.rl_agent_lab.agents.q_learning import QLearningAgent
-from src.rl_agent_lab.environments.grid_world import GridWorld
+from rl_agent_lab.agents.q_learning import QLearningAgent
+from rl_agent_lab.environments.grid_world import GridWorld
+from rl_agent_lab.visualization.plot_rewards import plot_rewards
 
 
 def train(episodes=1000):
@@ -10,13 +11,11 @@ def train(episodes=1000):
     rewards = []
 
     for episode in range(episodes):
-
         state = env.reset()
-
         total_reward = 0
+        max_steps = 100
 
-        while True:
-
+        for _ in range(max_steps):
             action = agent.choose_action(state)
 
             next_state, reward, done = env.step(action)
@@ -30,14 +29,12 @@ def train(episodes=1000):
             )
 
             state = next_state
-
             total_reward += reward
 
             if done:
                 break
 
         agent.decay_exploration()
-
         rewards.append(total_reward)
 
         if (episode + 1) % 100 == 0:
@@ -51,4 +48,5 @@ def train(episodes=1000):
 
 
 if __name__ == "__main__":
-    train()
+    agent, rewards = train(episodes=1000)
+    plot_rewards(rewards)
