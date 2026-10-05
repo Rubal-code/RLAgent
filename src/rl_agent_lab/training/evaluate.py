@@ -19,10 +19,12 @@ def evaluate(agent: QLearningAgent, env: GridWorld):
 
     path = [state]
 
-    while True:
+    max_steps = 100
+
+    for _ in range(max_steps):
+
         q_values = agent.get_q_values(state)
 
-        # Always choose the best learned action.
         action = q_values.index(max(q_values))
 
         next_state, reward, done = env.step(action)
@@ -55,13 +57,51 @@ def print_q_table(agent):
             f"RIGHT={q_values[3]:.2f}"
         )
 
+def print_policy(agent, env):
+    """
+    Print the best learned action for every cell.
+    """
+
+    arrows = {
+        0: "↑",
+        1: "↓",
+        2: "←",
+        3: "→",
+    }
+
+    print("\n--- Learned Policy ---")
+
+    for row in range(env.size):
+        line = ""
+
+        for col in range(env.size):
+
+            state = (row, col)
+
+            if state == env.start:
+                line += "S "
+
+            elif state == env.goal:
+                line += "G "
+
+            elif state in env.obstacles:
+                line += "X "
+
+            else:
+                q_values = agent.get_q_values(state)
+
+                best_action = q_values.index(max(q_values))
+
+                line += f"{arrows[best_action]} "
+
+        print(line)
 
 if __name__ == "__main__":
     agent, _ = train(episodes=1000)
 
     env = GridWorld(size=5)
 
-    print_q_table(agent)
+    print_policy(agent, env)
 
     print("\n--- Evaluation ---")
 
