@@ -1,5 +1,7 @@
 import random
 
+from rl_agent_lab.agents.bellman import bellman_update
+
 
 class QLearningAgent:
     """
@@ -51,22 +53,20 @@ class QLearningAgent:
         return q_values.index(max(q_values))
 
     def update(self, state, action, reward, next_state, done):
-        """
-        Update Q-value using the Q-Learning formula.
-        """
-
         current_q = self.get_q_values(state)[action]
 
         if done:
-            target = reward
-
+            next_max_q = 0.0
         else:
-            next_q = max(self.get_q_values(next_state))
+            next_max_q = max(self.get_q_values(next_state))
 
-            target = reward + self.discount_factor * next_q
-
-        new_q = current_q + self.learning_rate * (
-            target - current_q
+        new_q = bellman_update(
+            current_q=current_q,
+            reward=reward,
+            next_max_q=next_max_q,
+            learning_rate=self.learning_rate,
+            discount_factor=self.discount_factor,
+            done=done,
         )
 
         self.q_table[state][action] = new_q

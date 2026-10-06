@@ -3,13 +3,19 @@ import gymnasium as gym
 from rl_agent_lab.agents.q_learning import QLearningAgent
 
 
-def train(episodes=1000):
+def train(episodes=5000):
     env = gym.make(
         "FrozenLake-v1",
         is_slippery=False,
     )
 
-    agent = QLearningAgent()
+    agent = QLearningAgent(
+    learning_rate=0.1,
+    discount_factor=0.99,
+    exploration_rate=1.0,
+    exploration_decay=0.999,
+    min_exploration_rate=0.05,
+)
 
     successes = 0
 
@@ -55,4 +61,4 @@ def train(episodes=1000):
 
 
 if __name__ == "__main__":
-    train(episodes=1000)
+    train(episodes=5000)
