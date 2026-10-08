@@ -1,3 +1,5 @@
-numpy
 gymnasium
+torch
+pygame
 matplotlib
+numpy
