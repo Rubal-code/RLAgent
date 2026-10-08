@@ -1,6 +1,7 @@
 import gymnasium as gym
 
 from rl_agent_lab.agents.dqn_agent import DQNAgent
+from rl_agent_lab.agents.dqn_model_io import save_model
 from rl_agent_lab.visualization.plot_rewards import plot_rewards
 
 
@@ -57,4 +58,10 @@ def train(episodes=500):
 
 if __name__ == "__main__":
     agent, rewards = train(episodes=500)
+
+    save_model(
+        agent,
+        "models/cartpole_dqn.pth",
+    )
+
     plot_rewards(rewards)
