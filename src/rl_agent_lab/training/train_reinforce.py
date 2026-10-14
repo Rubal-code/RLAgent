@@ -3,6 +3,7 @@ import gymnasium as gym
 import matplotlib.pyplot as plt
 
 from rl_agent_lab.agents.reinforce_agent import REINFORCEAgent
+from rl_agent_lab.agents.reinforce_model_io import save_model
 
 
 def train(episodes=1000):
@@ -69,4 +70,5 @@ def plot_rewards(rewards):
 
 if __name__ == "__main__":
     trained_agent, rewards = train(episodes=1000)
+    save_model(trained_agent, "models/cartpole_reinforce.pth")
     plot_rewards(rewards)
