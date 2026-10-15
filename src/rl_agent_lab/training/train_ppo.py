@@ -113,7 +113,7 @@ def train(episodes=1000, update_interval=2048):
 
 
 if __name__ == "__main__":
-    trained_agent, rewards = train(episodes=50)
+    trained_agent, rewards = train(episodes=1000)
 
     model_path = Path("models/lunarlander_ppo.pth")
     model_path.parent.mkdir(parents=True, exist_ok=True)
