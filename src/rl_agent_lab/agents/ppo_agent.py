@@ -42,43 +42,42 @@ class PPOAgent:
 
         return action.item(), log_probability.item(), value.item()
 
+    
     def compute_returns_and_advantages(
         self,
         rewards,
         values,
         dones,
-        next_value=0.0,
+        next_values,
+        terminateds,
     ):
         returns = []
         advantages = []
         gae = 0.0
-        next_value_estimate = next_value
 
-        for reward, value, done in zip(
-            reversed(rewards),
-            reversed(values),
-            reversed(dones),
-        ):
-            if done:
-                next_value_estimate = 0.0
-                gae = 0.0
+        for index in reversed(range(len(rewards))):
+            bootstrap_mask = 1.0 - float(terminateds[index])
+            continuation_mask = 1.0 - float(dones[index])
 
             delta = (
-                reward
-                + self.gamma * next_value_estimate
-                - value
+                rewards[index]
+                + self.gamma * next_values[index] * bootstrap_mask
+                - values[index]
             )
 
-            gae = delta + self.gamma * 0.95 * (1 - int(done)) * gae
+            gae = (
+                delta
+                + self.gamma * 0.95 * continuation_mask * gae
+            )
 
-            returns.insert(0, gae + value)
+            returns.insert(0, gae + values[index])
             advantages.insert(0, gae)
-            next_value_estimate = value
 
         return (
             torch.tensor(returns, dtype=torch.float32),
             torch.tensor(advantages, dtype=torch.float32),
         )
+
 
     def update(
         self,

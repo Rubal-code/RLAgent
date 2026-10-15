@@ -16,6 +16,7 @@ def test_ppo_choose_action():
     assert isinstance(value, float)
 
 
+
 def test_ppo_returns_and_advantages():
     agent = PPOAgent()
 
@@ -23,13 +24,18 @@ def test_ppo_returns_and_advantages():
         rewards=[1.0, 1.0],
         values=[0.5, 0.6],
         dones=[False, True],
+        next_values=[0.6, 0.0],
+        terminateds=[False, True],
     )
 
     assert returns.shape == (2,)
     assert advantages.shape == (2,)
     assert torch.isfinite(returns).all()
     assert torch.isfinite(advantages).all()
-    assert returns[1].item() == 1.0
+
+    # The final transition is terminal, so its return is its reward.
+    assert abs(returns[1].item() - 1.0) < 1e-6
+
 
 
 def test_ppo_update():
