@@ -3,3 +3,4 @@ torch
 pygame
 matplotlib
 numpy
+gymnasium[box2d]
