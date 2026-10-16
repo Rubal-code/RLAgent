@@ -12,6 +12,19 @@ def train(episodes=1000, update_interval=2048):
     env = gym.make("LunarLander-v3")
     agent = PPOAgent()
 
+    checkpoint_path = Path("models/lunarlander_ppo.pth")
+
+    if checkpoint_path.exists():
+        agent.policy.load_state_dict(
+            torch.load(
+                checkpoint_path,
+                map_location="cpu",
+                weights_only=True,
+            )
+        )
+        agent.policy.train()
+        print(f"Resuming training from {checkpoint_path}")
+
     states = []
     actions = []
     rewards = []
