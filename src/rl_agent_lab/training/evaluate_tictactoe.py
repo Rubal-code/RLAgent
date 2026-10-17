@@ -4,6 +4,7 @@ import random
 from pathlib import Path
 
 from rl_agent_lab.environments.tictactoe import TicTacToe
+from rl_agent_lab.training.experiment_tracker import log_experiment
 
 
 def evaluate(episodes=1000, seed=123):
@@ -73,7 +74,27 @@ def evaluate(episodes=1000, seed=123):
 
     print(f"Evaluation games: {episodes}")
     for result, count in results.items():
-        print(f"{result.capitalize()} rate: {count / episodes:.1%} ({count}/{episodes})")
+        print(
+            f"{result.capitalize()} rate: "
+            f"{count / episodes:.1%} ({count}/{episodes})"
+        )
+
+    metrics = {
+        "win_rate": results["win"] / episodes,
+        "draw_rate": results["draw"] / episodes,
+        "loss_rate": results["loss"] / episodes,
+    }
+
+    log_path = log_experiment(
+        algorithm="Q-Learning",
+        environment="TicTacToe-vs-Random",
+        seed=seed,
+        episodes=episodes,
+        metrics=metrics,
+        model_path=str(model_path),
+    )
+
+    print(f"Experiment results logged to: {log_path}")
 
 
 if __name__ == "__main__":
