@@ -1,29 +1,36 @@
-
 import argparse
+import random
 from pathlib import Path
 
+from rl_agent_lab.agents.model_io import save_q_table
 from rl_agent_lab.training.experiment_tracker import log_experiment
 from rl_agent_lab.training.train_q_learning import train
 
 
 def run_q_learning(episodes: int, seed: int) -> None:
-    """Train Q-Learning on GridWorld and record its metrics."""
-    import random
-
+    """Train Q-Learning, save the model, and record experiment metrics."""
     random.seed(seed)
 
     agent, rewards, successes = train(episodes=episodes)
 
+    if not rewards or not successes:
+        raise RuntimeError("Training returned no results.")
+
+    # Save the newly trained Q-table.
+    model_path = Path("models") / "q_table.json"
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+
+    save_q_table(agent, str(model_path))
+
     average_reward = sum(rewards) / len(rewards)
     success_rate = sum(successes) / len(successes)
-
-    model_path = Path("models") / "q_table.json"
+    recent_rewards = rewards[-min(100, len(rewards)):]
 
     metrics = {
         "average_reward": average_reward,
         "success_rate": success_rate,
         "final_100_average_reward": (
-            sum(rewards[-100:]) / len(rewards[-100:])
+            sum(recent_rewards) / len(recent_rewards)
         ),
     }
 
@@ -37,11 +44,12 @@ def run_q_learning(episodes: int, seed: int) -> None:
     )
 
     print("\n--- Experiment Summary ---")
-    print(f"Algorithm: Q-Learning")
-    print(f"Environment: GridWorld")
+    print("Algorithm: Q-Learning")
+    print("Environment: GridWorld")
     print(f"Episodes: {episodes}")
     print(f"Average reward: {average_reward:.2f}")
     print(f"Success rate: {success_rate:.1%}")
+    print(f"Model saved to: {model_path}")
     print(f"Results logged to: {log_path}")
 
 
