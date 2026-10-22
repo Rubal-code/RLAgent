@@ -11,11 +11,17 @@ from rl_agent_lab.agents.model_io import save_q_table
 from rl_agent_lab.agents.reinforce_model_io import (
     save_model as save_reinforce_model,
 )
+from rl_agent_lab.training.evaluate_tictactoe import (
+    evaluate as evaluate_tictactoe,
+)
 from rl_agent_lab.training.experiment_tracker import log_experiment
 from rl_agent_lab.training.train_dqn import train as train_dqn
 from rl_agent_lab.training.train_ppo import train as train_ppo
 from rl_agent_lab.training.train_q_learning import train as train_q_learning
 from rl_agent_lab.training.train_reinforce import train as train_reinforce
+from rl_agent_lab.training.train_tictactoe import (
+    train as train_tictactoe,
+)
 
 
 def set_seed(seed: int) -> None:
@@ -130,11 +136,12 @@ def run_reinforce(episodes: int, seed: int) -> None:
 
 def run_ppo(episodes: int, seed: int) -> None:
     set_seed(seed)
+
     agent, rewards = train_ppo(
-    episodes=episodes,
-    seed=seed,
-    resume=False,
-)
+        episodes=episodes,
+        seed=seed,
+        resume=False,
+    )
 
     if not rewards:
         raise RuntimeError("PPO training returned empty results.")
@@ -156,13 +163,40 @@ def run_ppo(episodes: int, seed: int) -> None:
     )
 
 
+def run_tictactoe(episodes: int, seed: int) -> None:
+    """Train Tic-Tac-Toe and evaluate the saved Q-table."""
+    if episodes <= 0:
+        raise ValueError("Episodes must be greater than zero.")
+
+    set_seed(seed)
+
+    train_tictactoe(episodes=episodes, seed=seed)
+
+    model_path = Path("models") / "tictactoe_q_table.pkl"
+
+    if not model_path.exists():
+        raise FileNotFoundError(
+            f"Tic-Tac-Toe model was not saved at {model_path}"
+        )
+
+    print("\nEvaluating Tic-Tac-Toe against a random opponent...")
+    evaluate_tictactoe(episodes=1000, seed=seed)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Unified RL experiment runner"
     )
+
     parser.add_argument(
         "--algorithm",
-        choices=["q-learning", "dqn", "reinforce", "ppo"],
+        choices=[
+            "q-learning",
+            "dqn",
+            "reinforce",
+            "ppo",
+            "tictactoe",
+        ],
         default="q-learning",
     )
     parser.add_argument("--episodes", type=int, default=1000)
@@ -178,6 +212,7 @@ def main() -> None:
         "dqn": run_dqn,
         "reinforce": run_reinforce,
         "ppo": run_ppo,
+        "tictactoe": run_tictactoe,
     }
 
     runners[args.algorithm](args.episodes, args.seed)
