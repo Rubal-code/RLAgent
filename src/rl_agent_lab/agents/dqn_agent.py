@@ -1,5 +1,6 @@
 import random
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
@@ -82,10 +83,10 @@ class DQNAgent:
 
         states, actions, rewards, next_states, dones = zip(*batch)
 
-        states = torch.tensor(
-            states,
-            dtype=torch.float32,
-            device=self.device,
+        states = torch.as_tensor(
+        np.asarray(states),
+        dtype=torch.float32,
+        device=self.device,
         )
 
         actions = torch.tensor(
@@ -100,12 +101,11 @@ class DQNAgent:
             device=self.device,
         )
 
-        next_states = torch.tensor(
-            next_states,
+        next_states = torch.as_tensor(
+            np.asarray(next_states),
             dtype=torch.float32,
             device=self.device,
         )
-
         dones = torch.tensor(
             dones,
             dtype=torch.float32,
