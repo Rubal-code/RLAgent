@@ -63,6 +63,7 @@ def log_summary(
 
 
 def run_q_learning(episodes: int, seed: int) -> None:
+    """Train Q-Learning, save the Q-table, and log metrics."""
     set_seed(seed)
     agent, rewards, successes = train_q_learning(episodes=episodes)
 
@@ -82,13 +83,23 @@ def run_q_learning(episodes: int, seed: int) -> None:
     }
 
     log_summary(
-        "Q-Learning", "GridWorld", episodes, seed, metrics, model_path
+        "Q-Learning",
+        "GridWorld",
+        episodes,
+        seed,
+        metrics,
+        model_path,
     )
 
 
 def run_dqn(episodes: int, seed: int) -> None:
+    """Train DQN, save the model, and log metrics."""
     set_seed(seed)
-    agent, rewards = train_dqn(episodes=episodes)
+
+    agent, rewards = train_dqn(
+        episodes=episodes,
+        seed=seed,
+    )
 
     if not rewards:
         raise RuntimeError("DQN training returned empty results.")
@@ -106,13 +117,23 @@ def run_dqn(episodes: int, seed: int) -> None:
     }
 
     log_summary(
-        "DQN", "CartPole-v1", episodes, seed, metrics, model_path
+        "DQN",
+        "CartPole-v1",
+        episodes,
+        seed,
+        metrics,
+        model_path,
     )
 
 
 def run_reinforce(episodes: int, seed: int) -> None:
+    """Train REINFORCE, save the model, and log metrics."""
     set_seed(seed)
-    agent, rewards = train_reinforce(episodes=episodes)
+
+    agent, rewards = train_reinforce(
+        episodes=episodes,
+        seed=seed,
+    )
 
     if not rewards:
         raise RuntimeError("REINFORCE training returned empty results.")
@@ -130,11 +151,17 @@ def run_reinforce(episodes: int, seed: int) -> None:
     }
 
     log_summary(
-        "REINFORCE", "CartPole-v1", episodes, seed, metrics, model_path
+        "REINFORCE",
+        "CartPole-v1",
+        episodes,
+        seed,
+        metrics,
+        model_path,
     )
 
 
 def run_ppo(episodes: int, seed: int) -> None:
+    """Train PPO, save the policy, and log metrics."""
     set_seed(seed)
 
     agent, rewards = train_ppo(
@@ -159,7 +186,12 @@ def run_ppo(episodes: int, seed: int) -> None:
     }
 
     log_summary(
-        "PPO", "LunarLander-v3", episodes, seed, metrics, model_path
+        "PPO",
+        "LunarLander-v3",
+        episodes,
+        seed,
+        metrics,
+        model_path,
     )
 
 
@@ -169,7 +201,6 @@ def run_tictactoe(episodes: int, seed: int) -> None:
         raise ValueError("Episodes must be greater than zero.")
 
     set_seed(seed)
-
     train_tictactoe(episodes=episodes, seed=seed)
 
     model_path = Path("models") / "tictactoe_q_table.pkl"
@@ -184,6 +215,7 @@ def run_tictactoe(episodes: int, seed: int) -> None:
 
 
 def main() -> None:
+    """Parse CLI arguments and execute the selected experiment."""
     parser = argparse.ArgumentParser(
         description="Unified RL experiment runner"
     )

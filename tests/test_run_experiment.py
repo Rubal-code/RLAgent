@@ -117,7 +117,7 @@ def test_dqn_runner_saves_model_and_logs_metrics(monkeypatch, tmp_path):
     monkeypatch.setattr(
         run_experiment,
         "train_dqn",
-        lambda episodes: (DummyAgent(), [10.0, 20.0, 30.0]),
+        lambda episodes, seed: (DummyAgent(), [10.0, 20.0, 30.0]),
     )
 
     def fake_save_model(agent, path):
@@ -156,7 +156,7 @@ def test_dqn_runner_rejects_empty_training_results(monkeypatch):
     monkeypatch.setattr(
         run_experiment,
         "train_dqn",
-        lambda episodes: (DummyAgent(), []),
+        lambda episodes, seed: (DummyAgent(), []),
     )
 
     with pytest.raises(RuntimeError, match="empty results"):
@@ -174,7 +174,7 @@ def test_reinforce_runner_saves_model_and_logs_metrics(
     monkeypatch.setattr(
         run_experiment,
         "train_reinforce",
-        lambda episodes: (DummyAgent(), [10.0, 20.0, 30.0]),
+        lambda episodes, seed: (DummyAgent(), [10.0, 20.0, 30.0]),
     )
 
     def fake_save_model(agent, path):
@@ -217,7 +217,7 @@ def test_reinforce_runner_rejects_empty_training_results(monkeypatch):
     monkeypatch.setattr(
         run_experiment,
         "train_reinforce",
-        lambda episodes: (DummyAgent(), []),
+        lambda episodes, seed: (DummyAgent(), []),
     )
 
     with pytest.raises(RuntimeError, match="empty results"):

@@ -1,47 +1,69 @@
 
+import random
+
 import gymnasium as gym
 import matplotlib.pyplot as plt
+import numpy as np
+import torch
 
 from rl_agent_lab.agents.reinforce_agent import REINFORCEAgent
 from rl_agent_lab.agents.reinforce_model_io import save_model
 
 
-def train(episodes=1000):
-    env = gym.make("CartPole-v1")
-    agent = REINFORCEAgent()
+def train(episodes=1000, seed=None):
+    """Train a REINFORCE agent with optional reproducible seeding."""
+    if episodes <= 0:
+        raise ValueError("Episodes must be greater than zero.")
 
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+
+    env = gym.make("CartPole-v1")
+
+    if seed is not None:
+        env.action_space.seed(seed)
+
+    agent = REINFORCEAgent()
     episode_rewards = []
 
-    for episode in range(episodes):
-        state, _ = env.reset()
-        total_reward = 0.0
-        terminated = False
-        truncated = False
+    try:
+        for episode in range(episodes):
+            if episode == 0 and seed is not None:
+                state, _ = env.reset(seed=seed)
+            else:
+                state, _ = env.reset()
 
-        while not (terminated or truncated):
-            action = agent.choose_action(state)
+            total_reward = 0.0
+            terminated = False
+            truncated = False
 
-            next_state, reward, terminated, truncated, _ = (
-                env.step(action)
-            )
+            while not (terminated or truncated):
+                action = agent.choose_action(state)
 
-            agent.store_reward(reward)
-            total_reward += reward
-            state = next_state
+                next_state, reward, terminated, truncated, _ = (
+                    env.step(action)
+                )
 
-        loss = agent.train_episode()
-        episode_rewards.append(total_reward)
+                agent.store_reward(reward)
+                total_reward += reward
+                state = next_state
 
-        if (episode + 1) % 50 == 0:
-            recent_average = sum(episode_rewards[-50:]) / 50
+            loss = agent.train_episode()
+            episode_rewards.append(total_reward)
 
-            print(
-                f"Episode {episode + 1}/{episodes} | "
-                f"Average Reward: {recent_average:.2f} | "
-                f"Loss: {loss:.4f}"
-            )
+            if (episode + 1) % 50 == 0:
+                recent_average = sum(episode_rewards[-50:]) / 50
 
-    env.close()
+                print(
+                    f"Episode {episode + 1}/{episodes} | "
+                    f"Average Reward: {recent_average:.2f} | "
+                    f"Loss: {loss:.4f}"
+                )
+    finally:
+        env.close()
+
     return agent, episode_rewards
 
 
@@ -69,6 +91,6 @@ def plot_rewards(rewards):
 
 
 if __name__ == "__main__":
-    trained_agent, rewards = train(episodes=1000)
+    trained_agent, rewards = train(episodes=1000, seed=42)
     save_model(trained_agent, "models/cartpole_reinforce.pth")
     plot_rewards(rewards)
