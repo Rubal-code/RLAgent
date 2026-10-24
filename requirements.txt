@@ -1,6 +1,8 @@
 gymnasium
+gymnasium[box2d]
 torch
 pygame
 matplotlib
 numpy
-gymnasium[box2d]
+fastapi>=0.115
+uvicorn[standard]>=0.30

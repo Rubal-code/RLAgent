@@ -38,6 +38,8 @@ def log_summary(
     seed: int,
     metrics: dict[str, float],
     model_path: Path,
+    hyperparameters: dict | None = None,
+    results_dir: str | Path = "results",
 ) -> None:
     """Log experiment metadata and print a concise summary."""
     log_experiment(
@@ -47,7 +49,11 @@ def log_summary(
         episodes=episodes,
         metrics=metrics,
         model_path=str(model_path),
+        hyperparameters=hyperparameters,
+        results_dir=results_dir,
     )
+
+    results_path = Path(results_dir) / "experiments.jsonl"
 
     print("\n--- Experiment Summary ---")
     print(f"Algorithm: {algorithm}")
@@ -59,7 +65,7 @@ def log_summary(
         print(f"{name.replace('_', ' ').title()}: {value:.3f}")
 
     print(f"Model saved to: {model_path}")
-    print("Results logged to: results/experiments.jsonl")
+    print(f"Results logged to: {results_path}")
 
 
 def run_q_learning(episodes: int, seed: int) -> None:
@@ -82,6 +88,13 @@ def run_q_learning(episodes: int, seed: int) -> None:
         "final_100_average_reward": float(np.mean(recent_rewards)),
     }
 
+    hyperparameters = {
+        "learning_rate": getattr(agent, "learning_rate", None),
+        "discount_factor": getattr(agent, "discount_factor", None),
+        "exploration_decay": getattr(agent, "exploration_decay", None),
+        "min_exploration_rate": getattr(agent, "min_exploration_rate", None),
+    }
+
     log_summary(
         "Q-Learning",
         "GridWorld",
@@ -89,6 +102,7 @@ def run_q_learning(episodes: int, seed: int) -> None:
         seed,
         metrics,
         model_path,
+        hyperparameters=hyperparameters,
     )
 
 
@@ -116,6 +130,13 @@ def run_dqn(episodes: int, seed: int) -> None:
         "best_reward": float(max(rewards)),
     }
 
+    hyperparameters = {
+        "learning_rate": 0.001,
+        "discount_factor": getattr(agent, "discount_factor", None),
+        "exploration_decay": getattr(agent, "exploration_decay", None),
+        "min_exploration_rate": getattr(agent, "min_exploration_rate", None),
+    }
+
     log_summary(
         "DQN",
         "CartPole-v1",
@@ -123,6 +144,7 @@ def run_dqn(episodes: int, seed: int) -> None:
         seed,
         metrics,
         model_path,
+        hyperparameters=hyperparameters,
     )
 
 

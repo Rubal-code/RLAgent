@@ -9,6 +9,28 @@ description = "A hands-on reinforcement learning laboratory"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
+dependencies = [
+    "gymnasium",
+    "torch",
+    "numpy",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+]
+
+[project.optional-dependencies]
+box2d = ["gymnasium[box2d]", "pygame"]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "httpx>=0.27",
+]
+
+[project.scripts]
+run-experiment = "rl_agent_lab.training.run_experiment:main"
+evaluate-seeds = "rl_agent_lab.training.evaluate_multiple_seeds:main"
+compare-experiments = "rl_agent_lab.training.compare_experiments:main"
+rl-api = "rl_agent_lab.api.main:start"
 
 [tool.setuptools.packages.find]
 where = ["src"]
