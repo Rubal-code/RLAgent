@@ -108,3 +108,43 @@ def test_run_evaluation_rejects_duplicate_seeds(tmp_path):
             seeds=[42, 42],
             output_path=tmp_path / "evaluation.json",
         )
+
+
+def test_run_evaluation_logs_each_run(monkeypatch, tmp_path):
+    def fake_dqn(episodes, seed):
+        return object(), [10.0, 20.0, 30.0]
+
+    def fake_reinforce(episodes, seed):
+        return object(), [20.0, 30.0, 40.0]
+
+    monkeypatch.setattr(evaluation, "train_dqn", fake_dqn)
+    monkeypatch.setattr(evaluation, "train_reinforce", fake_reinforce)
+
+    output_path = tmp_path / "evaluation.json"
+
+    evaluation.run_evaluation(
+        episodes=3,
+        seeds=[11, 22],
+        output_path=output_path,
+    )
+
+    log_path = tmp_path / "experiments.jsonl"
+    records = [
+        json.loads(line)
+        for line in log_path.read_text(encoding="utf-8").splitlines()
+    ]
+
+    assert len(records) == 4
+    assert {
+        (record["algorithm"], record["seed"])
+        for record in records
+    } == {
+        ("DQN", 11),
+        ("DQN", 22),
+        ("REINFORCE", 11),
+        ("REINFORCE", 22),
+    }
+    assert all(record["episodes"] == 3 for record in records)
+    assert all(record["environment"] == "CartPole-v1" for record in records)
+    assert output_path.exists()
+
