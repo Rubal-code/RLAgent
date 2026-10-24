@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from statistics import mean, pstdev
 
+from rl_agent_lab.training.experiment_tracker import log_experiment
 from rl_agent_lab.training.train_dqn import train as train_dqn
 from rl_agent_lab.training.train_reinforce import (
     train as train_reinforce,
@@ -60,7 +61,7 @@ def run_evaluation(
     seeds: list[int],
     output_path: Path,
 ) -> dict:
-    """Evaluate DQN and REINFORCE over multiple random seeds."""
+    """Evaluate DQN and REINFORCE over multiple seeds and log each run."""
     if episodes <= 0:
         raise ValueError("Episodes must be greater than zero.")
 
@@ -86,6 +87,16 @@ def run_evaluation(
 
             _, rewards = trainer(episodes=episodes, seed=seed)
             metrics = calculate_metrics(rewards)
+
+            # Record this run in the append-only experiment history.
+            log_experiment(
+                algorithm=algorithm,
+                environment="CartPole-v1",
+                seed=seed,
+                episodes=episodes,
+                metrics=metrics,
+                results_dir=output_path.parent,
+            )
 
             run = {
                 "algorithm": algorithm,
@@ -128,6 +139,11 @@ def run_evaluation(
             )
 
     print(f"\nFull results saved to: {output_path}")
+    print(
+        "Individual runs logged to: "
+        f"{output_path.parent / 'experiments.jsonl'}"
+    )
+
     return result
 
 
